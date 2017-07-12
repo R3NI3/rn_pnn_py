@@ -1,6 +1,7 @@
 import numpy as np
 import operator
 import csv
+from functools import reduce
 
 class pnn:
 	def __init__(self, sigma):
@@ -41,16 +42,18 @@ def hyperedge_feat_selection(features, threshhold):
 	#choose features that are similar
 	feat_vec = map(lambda feat:1 if np.where(feat < threshhold)[0].size == len(features)**2
 								else 0, feat_diss_mat);
-	print feat_vec
+
 	return feat_vec
 
 def test():
+	#inicialization
 	try:
 		myfile = open("data.csv", "rb")
 	except IOError:
 		print "error opening file\n"
 		return
 	sigma = 0.2
+	sim_threshhold = 0.3
 
 	reader = csv.reader(myfile, delimiter=",")
 	data = list(reader)
@@ -62,9 +65,12 @@ def test():
 	#divide features into classes
 	feat_class = map(lambda cl: filter(lambda dt: dt[att_len-1] == cl, data),
 																	clss_set)
-	map(lambda feat_per_class:hyperedge_feat_selection(feat_per_class, 0.3),
+	hyperedge = map(lambda feat_per_class:hyperedge_feat_selection(feat_per_class, sim_threshhold),
 																	feat_class)
+	#Helly property to define features
+	feat_vec = map(lambda f: reduce(operator.mul, f, 1), np.transpose(hyperedge))
 
+	#Todo: select only relevant features from helly property
 	features = map(lambda entry:map(lambda feat: float(feat),
 												entry[0:att_len-1]), data)
 
