@@ -1,6 +1,7 @@
 import numpy as np
 import operator
 import csv
+from functools import reduce
 
 class pnn:
 	def __init__(self, sigma):
@@ -29,22 +30,52 @@ class pnn:
 
 		return result
 
+#This function needs to be checked if it really corresponds to the hyperedge method
+def hyperedge_feat_selection(features, threshhold):
+	#get features as float
+	att_len = len(features[0])
+	features = map(lambda entry:map(lambda feat: float(feat),
+												entry[0:att_len-1]), features)
+	#calc of euclidean distance matrix
+	feat = np.transpose(features)
+	feat_diss_mat = map(lambda f: abs(f[..., np.newaxis] - f), feat)
+	#choose features that are similar
+	feat_vec = map(lambda feat:1 if np.where(feat < threshhold)[0].size == len(features)**2
+								else 0, feat_diss_mat);
+
+	return feat_vec
+
 def test():
+	#inicialization
 	try:
 		myfile = open("data.csv", "rb")
 	except IOError:
 		print "error opening file\n"
 		return
+	sigma = 0.2
+	sim_threshhold = 0.3
 
 	reader = csv.reader(myfile, delimiter=",")
 	data = list(reader)
 	att_len = len(data[0])
 
-	features = map(lambda entry:map(lambda feat: float(feat),
-												entry[0:att_len-1]), data)
 	clss = map(lambda entry:entry[att_len-1], data)
 
-	model = pnn(0.2)
+	clss_set = set(clss)
+	#divide features into classes
+	feat_class = map(lambda cl: filter(lambda dt: dt[att_len-1] == cl, data),
+																	clss_set)
+	hyperedge = map(lambda feat_per_class:hyperedge_feat_selection(feat_per_class, sim_threshhold),
+																	feat_class)
+	#Helly property to define features
+	feat_vec = map(lambda f: reduce(operator.mul, f, 1), np.transpose(hyperedge))
+
+	#Todo: select only relevant features from helly property
+	features = map(lambda entry:map(lambda feat: float(feat),
+												entry[0:att_len-1]), data)
+
+	#TODO: divide features and clss into training/test
+	model = pnn(sigma)
 	model.training_step(features, clss)
 	res = model.classification(features)
 	print res
