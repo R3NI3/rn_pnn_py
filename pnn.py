@@ -29,6 +29,21 @@ class pnn:
 
 		return result
 
+#This function needs to be checked if it really corresponds to the hyperedge method
+def hyperedge_feat_selection(features, threshhold):
+	#get features as float
+	att_len = len(features[0])
+	features = map(lambda entry:map(lambda feat: float(feat),
+												entry[0:att_len-1]), features)
+	#calc of euclidean distance matrix
+	feat = np.transpose(features)
+	feat_diss_mat = map(lambda f: abs(f[..., np.newaxis] - f), feat)
+	#choose features that are similar
+	feat_vec = map(lambda feat:1 if np.where(feat < threshhold)[0].size == len(features)**2
+								else 0, feat_diss_mat);
+	print feat_vec
+	return feat_vec
+
 def test():
 	try:
 		myfile = open("data.csv", "rb")
@@ -41,10 +56,19 @@ def test():
 	data = list(reader)
 	att_len = len(data[0])
 
-	features = map(lambda entry:map(lambda feat: float(feat),
-												entry[0:att_len-1]), data)
 	clss = map(lambda entry:entry[att_len-1], data)
 
+	clss_set = set(clss)
+	#divide features into classes
+	feat_class = map(lambda cl: filter(lambda dt: dt[att_len-1] == cl, data),
+																	clss_set)
+	map(lambda feat_per_class:hyperedge_feat_selection(feat_per_class, 0.3),
+																	feat_class)
+
+	features = map(lambda entry:map(lambda feat: float(feat),
+												entry[0:att_len-1]), data)
+
+	#TODO: divide features and clss into training/test
 	model = pnn(sigma)
 	model.training_step(features, clss)
 	res = model.classification(features)
