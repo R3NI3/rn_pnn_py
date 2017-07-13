@@ -8,6 +8,3 @@ def read_dataset(path = str):
 
 if __name__ == '__main__':
     content = read_dataset('Databases/kddcup.data.gz')
-
-    print content[0]
-    print content[1]
