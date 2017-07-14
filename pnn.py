@@ -12,16 +12,12 @@ class pnn:
 		#first layer weight matrix: w_mat1[i][j] is i -> j weight
 		self.w_mat1 = training_set
 		#second layer weight matrix: w_mat2[i][j] = 1 if j = class_i, 0 otherwise
-		self.w_mat2 = np.transpose([map(lambda k: 1 if k == i else 0, in_class)
-												for i in clss_set])
+		self.w_mat2 = np.transpose([map(lambda k: 1 if k == i else 0, in_class) for i in clss_set])
 
 	def classification(self, sample):
 		#step 1: compute pattern layer
-		z_mat = map(lambda smp:map(lambda w: np.subtract(w, smp), self.w_mat1),
-																		sample)
-		pattern_layer = map(lambda z_smp:map(lambda z:
-				np.exp(-np.dot(np.transpose(z),z)/(2*(self.sigma**2))),z_smp),
-																	z_mat) #Nxk
+		z_mat = map(lambda smp:map(lambda w: np.subtract(w, smp), self.w_mat1),sample)
+		pattern_layer = map(lambda z_smp:map(lambda z: np.exp(-np.dot(np.transpose(z),z)/(2*(self.sigma**2))),z_smp),z_mat) #Nxk
 		#step 2: compute summation layer (w_mat2 = kxN_Clss)
 		summ_layer = np.dot(pattern_layer, self.w_mat2) # NxN_Clss
 		#activation ??
@@ -31,17 +27,15 @@ class pnn:
 		return result
 
 #This function needs to be checked if it really corresponds to the hyperedge method
-def hyperedge_feat_selection(features, threshhold):
+def hyperedge_feat_selection(features, threshold):
 	#get features as float
 	att_len = len(features[0])
-	features = map(lambda entry:map(lambda feat: float(feat),
-												entry[0:att_len-1]), features)
+	features = map(lambda entry:map(lambda feat: float(feat),entry[0:att_len-1]), features)
 	#calc of euclidean distance matrix
 	feat = np.transpose(features)
 	feat_diss_mat = map(lambda f: abs(f[..., np.newaxis] - f), feat)
 	#choose features that are similar
-	feat_vec = map(lambda feat:1 if np.where(feat < threshhold)[0].size == len(features)**2
-								else 0, feat_diss_mat);
+	feat_vec = map(lambda feat:1 if np.where(feat < threshold)[0].size == len(features)**2 else 0, feat_diss_mat);
 
 	return feat_vec
 
@@ -53,7 +47,7 @@ def test():
 		print "error opening file\n"
 		return
 	sigma = 0.2
-	sim_threshhold = 0.3
+	sim_threshold = 0.3
 
 	reader = csv.reader(myfile, delimiter=",")
 	data = list(reader)
@@ -63,16 +57,13 @@ def test():
 
 	clss_set = set(clss)
 	#divide features into classes
-	feat_class = map(lambda cl: filter(lambda dt: dt[att_len-1] == cl, data),
-																	clss_set)
-	hyperedge = map(lambda feat_per_class:hyperedge_feat_selection(feat_per_class, sim_threshhold),
-																	feat_class)
+	feat_class = map(lambda cl: filter(lambda dt: dt[att_len-1] == cl, data), clss_set)
+	hyperedge = map(lambda feat_per_class:hyperedge_feat_selection(feat_per_class, sim_threshold), feat_class)
 	#Helly property to define features
 	feat_vec = map(lambda f: reduce(operator.mul, f, 1), np.transpose(hyperedge))
 
-	#Todo: select only relevant features from helly property
-	features = map(lambda entry:map(lambda feat: float(feat),
-												entry[0:att_len-1]), data)
+	features = map(lambda entry: map(lambda tuple: float(tuple[0]), filter(lambda z: z[1] == 1,zip(entry,feat_vec))), data)
+	#features = map(lambda entry:map(lambda feat: float(feat), entry[0:att_len-1]), data)
 
 	#TODO: divide features and clss into training/test
 	model = pnn(sigma)
