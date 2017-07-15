@@ -2,6 +2,7 @@ import numpy as np
 import operator
 import csv
 from functools import reduce
+import Util
 
 class pnn:
 	def __init__(self, sigma):
@@ -41,16 +42,21 @@ def hyperedge_feat_selection(features, threshold):
 
 def test():
 	#inicialization
-	try:
+	'''
+		try:
 		myfile = open("data.csv", "rb")
 	except IOError:
 		print "error opening file\n"
 		return
+	:return:
+	'''
+
 	sigma = 0.2
 	sim_threshold = 0.3
 
-	reader = csv.reader(myfile, delimiter=",")
-	data = list(reader)
+	#reader = csv.reader(myfile, delimiter=",")
+	data, labels = Util.load_dataset()
+	#data = list(reader)
 	att_len = len(data[0])
 
 	clss = map(lambda entry:entry[att_len-1], data)

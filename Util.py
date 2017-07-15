@@ -1,10 +1,26 @@
-import gzip
+import numpy as np
+import sklearn.datasets
+import pandas
 
-def read_dataset(path = str):
-    with gzip.open(path, 'rb') as f:
-        file_content = f.readlines()
+def load_dataset():
+    dataset = sklearn.datasets.fetch_kddcup99(percent10=True)
+    data = dataset.data
+    labels = dataset.target
+    dataset = None
+    data = convert_nominal_to_integer(data)
+    return data, labels
 
-    return file_content
+
+def convert_nominal_to_integer(data):
+    data = np.transpose(data).tolist()
+
+    data[1] = pandas.get_dummies(data[1]).values.argmax(1)
+    data[2] = pandas.get_dummies(data[1]).values.argmax(1)
+    data[3] = pandas.get_dummies(data[1]).values.argmax(1)
+
+    return np.transpose(data).astype(float)
 
 if __name__ == '__main__':
-    content = read_dataset('Databases/kddcup.data.gz')
+    dataset, labels = load_dataset()
+
+    print dataset
