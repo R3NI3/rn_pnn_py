@@ -2,7 +2,12 @@ import numpy as np
 import operator
 import csv
 from functools import reduce
+from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
 import Util
+
+sigma = 0.2
+sim_threshold = 0.3
 
 class pnn:
 	def __init__(self, sigma):
@@ -15,7 +20,7 @@ class pnn:
 		#second layer weight matrix: w_mat2[i][j] = 1 if j = class_i, 0 otherwise
 		self.w_mat2 = np.transpose([map(lambda k: 1 if k == i else 0, in_class) for i in clss_set])
 
-	def classification(self, sample):
+	def classification(self, sample, label):
 		#step 1: compute pattern layer
 		z_mat = map(lambda smp:map(lambda w: np.subtract(w, smp), self.w_mat1),sample)
 		pattern_layer = map(lambda z_smp:map(lambda z: np.exp(-np.dot(np.transpose(z),z)/(2*(self.sigma**2))),z_smp),z_mat) #Nxk
@@ -25,7 +30,14 @@ class pnn:
 		#step 3: Decide class
 		result = map(lambda per_smp:np.argmax(per_smp), summ_layer) #Nx1
 
-		return result
+		return result == label
+
+def classes(data):
+	#data = list(reader)
+	att_len = len(data[0])
+	clss = map(lambda entry:entry[att_len-1], data)
+
+	return att_len, clss
 
 #This function needs to be checked if it really corresponds to the hyperedge method
 def hyperedge_feat_selection(features, threshold):
@@ -40,6 +52,29 @@ def hyperedge_feat_selection(features, threshold):
 
 	return feat_vec
 
+def hg_fe(data, labels):
+	att_len = len(data[0])
+	clss = set(labels)
+
+	clss_set = set(clss)
+	#divide features into classes
+	feat_class = map(lambda cl: filter(lambda dt: dt[1] == cl, zip(data,labels)), clss_set)
+	hyperedge = map(lambda feat_per_class: hyperedge_feat_selection(feat_per_class[0], sim_threshold), feat_class)
+	#Helly property to define features
+	feat_vec = map(lambda f: reduce(operator.mul, f, 1), np.transpose(hyperedge))
+
+	features = map(lambda entry: map(lambda tuple: float(tuple[0]), filter(lambda z: z[1] == 1,zip(entry,feat_vec))), data)
+	#features = map(lambda entry:map(lambda feat: float(feat), entry[0:att_len-1]), data)
+
+	return features
+
+def pca_fe(data, attrs=5):
+	pca = PCA(n_components=attrs)
+	pca.fit(data)
+	features = pca.transform(data)
+
+	return features
+
 def test():
 	#inicialization
 	'''
@@ -51,30 +86,19 @@ def test():
 	:return:
 	'''
 
-	sigma = 0.2
-	sim_threshold = 0.3
-
 	#reader = csv.reader(myfile, delimiter=",")
 	data, labels = Util.load_dataset()
-	#data = list(reader)
-	att_len = len(data[0])
+	train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.33, random_state=42)
 
-	clss = map(lambda entry:entry[att_len-1], data)
+	# HG MODE
+	#features = hg_fe(train_data, train_labels)
 
-	clss_set = set(clss)
-	#divide features into classes
-	feat_class = map(lambda cl: filter(lambda dt: dt[att_len-1] == cl, data), clss_set)
-	hyperedge = map(lambda feat_per_class:hyperedge_feat_selection(feat_per_class, sim_threshold), feat_class)
-	#Helly property to define features
-	feat_vec = map(lambda f: reduce(operator.mul, f, 1), np.transpose(hyperedge))
+	# PCA mode
+	features = pca_fe(train_data)
 
-	features = map(lambda entry: map(lambda tuple: float(tuple[0]), filter(lambda z: z[1] == 1,zip(entry,feat_vec))), data)
-	#features = map(lambda entry:map(lambda feat: float(feat), entry[0:att_len-1]), data)
-
-	#TODO: divide features and clss into training/test
 	model = pnn(sigma)
-	model.training_step(features, clss)
-	res = model.classification(features)
+	model.training_step(features, labels)
+	res = model.classification(test_data, test_labels)
 	print res
 
 test()
