@@ -10,12 +10,12 @@ if __name__ == '__main__':
         results[name] = []
         for value in sigma_values:
             value = float(value + 1)/10
-            pnn = PNN.PNN(sigma=value, pca=True)
+            pnn = PNN.PNN(sigma=value, pca=False)
             dataset = Util.load_datasets(name=name)
             r = pnn.run(dataset.data.tolist(), dataset.target.tolist())
             results[name].append(["sigma: " + str(value), r[0], r[1][0], r[1][1], r[1][2], r[1][3]])
 
-    with open('results_pca.csv', 'wb') as csvfile:
+    with open('results.csv', 'wb') as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',',
                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
         for name in dataset_names:

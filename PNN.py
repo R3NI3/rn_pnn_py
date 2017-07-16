@@ -15,7 +15,7 @@ class PNN:
 
     def __init__(self, sigma, pca = False):
         self.sigma = sigma
-        self.PCA = pca
+        self.pca = pca
 
     def training_step(self, training_set, in_class):
         clss_set = set(in_class)
@@ -85,7 +85,7 @@ class PNN:
     def run(self, data, labels):
         if self.pca:
             data = self.pca_fe(data)
-        train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.33, random_state=42)
+        train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.66, random_state=42)
 
         # HG MODE
         #features = hg_fe(train_data, train_labels)
