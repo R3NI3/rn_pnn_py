@@ -4,10 +4,11 @@ import csv
 from functools import reduce
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
+import sklearn.metrics
 import Util
 
-sigma = 0.2
-sim_threshold = 0.3
+sigma = 0.9
+sim_threshold = 0.8
 
 class pnn:
 	def __init__(self, sigma):
@@ -30,7 +31,7 @@ class pnn:
 		#step 3: Decide class
 		result = map(lambda per_smp:np.argmax(per_smp), summ_layer) #Nx1
 
-		return result == label
+		return sklearn.metrics.accuracy_score(label, result)
 
 def classes(data):
 	#data = list(reader)
@@ -75,33 +76,26 @@ def pca_fe(data, attrs=5):
 
 	return features
 
-def test():
-	#inicialization
-	'''
-		try:
-		myfile = open("data.csv", "rb")
-	except IOError:
-		print "error opening file\n"
-		return
-	:return:
-	'''
+def run():
 
+    #datasets = ["iris", "digists", "diabets", "boston", "linerrud"]
 	#reader = csv.reader(myfile, delimiter=",")
-	data, labels = Util.load_dataset()
+	data, labels = Util.load_digits_dataset()
 	train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.33, random_state=42)
 
 	# HG MODE
-	#features = hg_fe(train_data, train_labels)
-
+	features = hg_fe(train_data, train_labels)
+        test_data = hg_fe(test_data)
 	# PCA mode
-	features = pca_fe(train_data)
+	#features = pca_fe(train_data)
+    #    test_data = pca_fe(test_data)
 
 	model = pnn(sigma)
-	model.training_step(features, labels)
+	model.training_step(features, train_labels)
 	res = model.classification(test_data, test_labels)
 	print res
 
-test()
+run()
 
 
 
