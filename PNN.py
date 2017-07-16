@@ -13,8 +13,9 @@ sim_threshold = 0.1
 
 class PNN:
 
-    def __init__(self, sigma):
+    def __init__(self, sigma, pca = False):
         self.sigma = sigma
+        self.PCA = pca
 
     def training_step(self, training_set, in_class):
         clss_set = set(in_class)
@@ -74,22 +75,21 @@ class PNN:
         return features
 
     def pca_fe(self, data, attrs=4):
-        pca = PCA(svd_solver='auto', whiten=True, n_components=attrs)
+        data = np.array(data)
+        pca = PCA(n_components=attrs)
         pca.fit(data)
         features = pca.transform(data)
 
         return features
 
     def run(self, data, labels):
-
+        if self.pca:
+            data = self.pca_fe(data)
         train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.33, random_state=42)
 
         # HG MODE
         #features = hg_fe(train_data, train_labels)
         #    test_data = hg_fe(test_data)
-        # PCA mode
-        #train_data = self.pca_fe(train_data)
-        #test_data = self.pca_fe(test_data)
 
         model = PNN(self.sigma)
         model.training_step(train_data, train_labels)
