@@ -10,12 +10,19 @@ def load_dataset():
     data = convert_nominal_to_integer(data)
     return data.tolist(), labels
 
-def load_digits_dataset():
-    dataset = sklearn.datasets.load_digits()
-    data = dataset.data
-    labels = dataset.target
+def load_datasets(name = None):
+    if name == "digits":
+        dataset = sklearn.datasets.load_digits()
+    if name == "diabets":
+        dataset = sklearn.datasets.load_diabetes()
+    if name == "b_cancer":
+        dataset = sklearn.datasets.load_breast_cancer()
+    if name == "iris":
+        dataset = sklearn.datasets.load_iris()
+    if name == "species":
+        dataset = sklearn.datasets.fetch_covtype()
 
-    return data.tolist(), labels.tolist()
+    return dataset
 
 
 def convert_nominal_to_integer(data):
