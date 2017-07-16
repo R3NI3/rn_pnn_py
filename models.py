@@ -4,6 +4,7 @@ import csv
 from functools import reduce
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 import sklearn.metrics
 import Util
 
@@ -13,9 +14,9 @@ sim_threshold = 0.1
 
 class PNN:
 
-    def __init__(self, sigma, pca = False):
+    def __init__(self, sigma, fe_model = 'None'):
         self.sigma = sigma
-        self.pca = pca
+        self.fe_model = fe_model
 
     def training_step(self, training_set, in_class):
         clss_set = set(in_class)
@@ -29,32 +30,30 @@ class PNN:
     def classification(self, sample, label):
         # step 1: compute pattern layer
         z_mat = map(lambda smp:map(lambda w: np.subtract(w, smp), self.w_mat1),sample)
-        pattern_layer = map(lambda z_smp:map(lambda z: np.exp(-np.dot(np.transpose(z),z)/(2*(self.sigma**2))),z_smp),z_mat) #Nxk
+        pattern_layer = map(lambda z_smp: map(lambda z: np.exp(-np.dot(np.transpose(z),z)/(2*(self.sigma**2))),z_smp),z_mat) #Nxk
         # step 2: compute summation layer (w_mat2 = kxN_Clss)
         summ_layer = np.dot(pattern_layer, self.w_mat2) # NxN_Clss
         # activation ??
         # step 3: Decide class
-        result = map(lambda per_smp:np.argmax(per_smp), summ_layer) #Nx1
+        result = map(lambda per_smp: np.argmax(per_smp), summ_layer) #Nx1
 
         return result
 
-    def classes(self, data):
-        # data = list(reader)
-        att_len = len(data[0])
-        clss = map(lambda entry:entry[att_len-1], data)
-
-        return att_len, clss
+    # def classes(self, data):
+    #     # data = list(reader)
+    #     att_len = len(data[0])
+    #     clss = map(lambda entry: entry[att_len-1], data)
+    #     return att_len, clss
 
     # This function needs to be checked if it really corresponds to the hyperedge method
     def hyperedge_feat_selection(self, features, threshold):
         # get features as float
-        att_len = len(features[0])
-        features = map(lambda entry:map(lambda feat: float(feat),entry[0:att_len-1]), features)
+        features = map(lambda entry: map(lambda feat: float(feat), entry), features)
         # calc of euclidean distance matrix
         feat = np.transpose(features)
         feat_diss_mat = map(lambda f: abs(f[..., np.newaxis] - f), feat)
         # choose features that are similar
-        feat_vec = map(lambda feat:1 if np.where(feat < threshold)[0].size == len(features)**2 else 0, feat_diss_mat);
+        feat_vec = map(lambda feat: 1 if np.where(feat < threshold)[0].size == len(features)**2 else 0, feat_diss_mat);
 
         return feat_vec
 
@@ -65,7 +64,7 @@ class PNN:
         clss_set = set(clss)
         #divide features into classes
         feat_class = map(lambda cl: filter(lambda dt: dt[1] == cl, zip(data,labels)), clss_set)
-        hyperedge = map(lambda feat_per_class: self.hyperedge_feat_selection(feat_per_class[0], sim_threshold), feat_class)
+        hyperedge = map(lambda feat_per_class: self.hyperedge_feat_selection([i[0] for i in feat_per_class], sim_threshold), feat_class)
         #Helly property to define features
         feat_vec = map(lambda f: reduce(operator.mul, f, 1), np.transpose(hyperedge))
 
@@ -83,20 +82,25 @@ class PNN:
         return features
 
     def run(self, data, labels):
-        if self.pca:
+        print len(data[0])
+        if self.fe_model == 'pca':
             data = self.pca_fe(data)
+        elif self.fe_model == 'hg':
+            print data[0]
+            npdata = np.array(data)
+            features = npdata[:,:-1]
+            labels = npdata[:,-1:]
+            scaler = MinMaxScaler()
+            normalized = scaler.fit_transform(features)
+            data = np.concatenate((normalized,labels),axis=1).tolist()
+            print data[0]
+            
+            data = self.hg_fe([i[:-1] for i in data], [i[-1] for i in data])
+        print len(data[0])
+        input()
         train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.66, random_state=42)
-
-        # HG MODE
-        #features = hg_fe(train_data, train_labels)
-        #    test_data = hg_fe(test_data)
 
         model = PNN(self.sigma)
         model.training_step(train_data, train_labels)
         res = model.classification(test_data, test_labels)
         return sklearn.metrics.accuracy_score(res, test_labels), np.mean(sklearn.metrics.precision_recall_fscore_support(res, test_labels), axis=1)
-
-
-
-
-
