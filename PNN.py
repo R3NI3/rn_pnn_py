@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 import sklearn.metrics
 import Util
 
-sigma = 0.5
+
 sim_threshold = 0.1
 
 
@@ -73,8 +73,8 @@ class PNN:
 
         return features
 
-    def pca_fe(self, data, attrs=5):
-        pca = PCA(n_components=attrs)
+    def pca_fe(self, data, attrs=4):
+        pca = PCA(svd_solver='auto', whiten=True, n_components=attrs)
         pca.fit(data)
         features = pca.transform(data)
 
@@ -82,16 +82,16 @@ class PNN:
 
     def run(self, data, labels):
 
-        train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.66)
+        train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.33, random_state=42)
 
         # HG MODE
         #features = hg_fe(train_data, train_labels)
         #    test_data = hg_fe(test_data)
         # PCA mode
-        #features = pca_fe(train_data)
-        #    test_data = pca_fe(test_data)
+        #train_data = self.pca_fe(train_data)
+        #test_data = self.pca_fe(test_data)
 
-        model = PNN(sigma)
+        model = PNN(self.sigma)
         model.training_step(train_data, train_labels)
         res = model.classification(test_data, test_labels)
         return sklearn.metrics.accuracy_score(res, test_labels), np.mean(sklearn.metrics.precision_recall_fscore_support(res, test_labels), axis=1)
