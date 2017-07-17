@@ -3,7 +3,7 @@ import Util
 import csv
 
 if __name__ == '__main__':
-    dataset_names = ["digits", "iris", "b_cancer"]
+    dataset_names = ["iris", "b_cancer", "digits"]
     results = {}
     sigma_values = range(10)
     for name in dataset_names:
@@ -12,7 +12,7 @@ if __name__ == '__main__':
         for value in sigma_values:
             print value
             value = float(value + 1)/10
-            pnn = PNN(sigma=value, fe_model='hg')
+            pnn = PNN(sigma=value, fe_model=None)
             dataset = Util.load_datasets(name=name)
             r = pnn.run(dataset.data.tolist(), dataset.target.tolist())
             results[name].append(["sigma: " + str(value), r[0], r[1][0], r[1][1], r[1][2], r[1][3]])
