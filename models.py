@@ -19,7 +19,7 @@ class PNN:
         self.fe_model = fe_model
 
     def training_step(self, training_set, in_class):
-        clss_set = set(in_class[0])
+        clss_set = set(in_class)
         #first layer weight matrix: w_mat1[i][j] is i -> j weight
 
         self.w_mat1 = training_set
@@ -85,14 +85,15 @@ class PNN:
         if self.fe_model == 'pca':
             data = self.pca_fe(data)
         elif self.fe_model == 'hg':
-            npdata = np.array(data)
-            features = npdata[:,:-1]
-            labels = npdata[:,-1:]
+            features = map(lambda entry:map(lambda feat: float(feat), entry[0:-1]), data)
+            labels = map(lambda entry:entry[-1], data)
+            labels_set = set(labels)
+            #represent labels as ints
+            labels = map(lambda lbl: list(labels_set).index(lbl), labels)
             scaler = MinMaxScaler()
             normalized = scaler.fit_transform(features)
-            data = np.concatenate((normalized,labels),axis=1).tolist()
+            data = self.hg_fe(normalized, labels)
 
-            data = self.hg_fe([i[:-1] for i in data], [i[-1] for i in data])
         train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.66, random_state=42)
 
         model = PNN(self.sigma)

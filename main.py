@@ -7,8 +7,10 @@ if __name__ == '__main__':
     results = {}
     sigma_values = range(10)
     for name in dataset_names:
+        print name
         results[name] = []
         for value in sigma_values:
+            print value
             value = float(value + 1)/10
             pnn = PNN(sigma=value, fe_model='hg')
             dataset = Util.load_datasets(name=name)
