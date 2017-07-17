@@ -45,31 +45,39 @@ class PNN:
     #     clss = map(lambda entry: entry[att_len-1], data)
     #     return att_len, clss
 
-    # This function needs to be checked if it really corresponds to the hyperedge method
-    def hyperedge_feat_selection(self, features, threshold):
-        # get features as float
-        features = map(lambda entry: map(lambda feat: float(feat), entry), features)
-        # calc of euclidean distance matrix
-        feat = np.transpose(features)
-        feat_diss_mat = map(lambda f: abs(f[..., np.newaxis] - f), feat)
-        # choose features that are similar
-        feat_vec = map(lambda feat: 1 if np.where(feat <= threshold)[0].size == len(features)**2 else 0, feat_diss_mat);
+    def best_feats(self, sample, others):
+        feats = []
+        for el in others:
+            dist = map(lambda f: abs(f[0]-f[1]), zip(sample,el))
+            feats.append(map(lambda d: 1 if d == max(dist) else 0, dist))
+
+        best = map(lambda t: any(t), np.transpose(feats))
+        return best
+
+    #This function needs to be checked if it really corresponds to the hyperedge method
+    def hyperedge_feat_selection(self, samples, threshold):
+        # # get features as float
+        # features = map(lambda entry: map(lambda feat: float(feat), entry), features)
+        # # calc of euclidean distance matrix
+        # feat = np.transpose(features)
+        # feat_diss_mat = map(lambda f: abs(f[..., np.newaxis] - f), feat)
+        # # choose features that are similar
+        # feat_vec = map(lambda feat: 1 if np.where(feat <= threshold)[0].size == len(features)**2 else 0, feat_diss_mat);
+        feat_per_sample = map(lambda s: self.best_feats(s,[i for i in samples if i != s]), samples)
+        feat_vec = map(lambda t: all(t),np.transpose(feat_per_sample))
 
         return feat_vec
 
     def hg_fe(self, data, labels):
-        att_len = len(data[0])
-        clss = set(labels)
-
-        clss_set = set(clss)
         #divide features into classes
+        clss_set = set(labels)
         feat_class = map(lambda cl: filter(lambda dt: dt[1] == cl, zip(data,labels)), clss_set)
         hyperedge = map(lambda feat_per_class: self.hyperedge_feat_selection([i[0] for i in feat_per_class], sim_threshold), feat_class)
-        #Helly property to define features
-        feat_vec = map(lambda f: reduce(operator.mul, f, 1), np.transpose(hyperedge))
 
+        #Helly property to define features
+        # feat_vec = map(lambda f: reduce(operator.mul, f, 1), np.transpose(hyperedge))
+        feat_vec = map(lambda t: any(t), np.transpose(hyperedge))
         features = map(lambda entry: map(lambda tuple: float(tuple[0]), filter(lambda z: z[1] == 1,zip(entry,feat_vec))), data)
-        #features = map(lambda entry:map(lambda feat: float(feat), entry[0:att_len-1]), data)
 
         return features
 
@@ -85,14 +93,14 @@ class PNN:
         if self.fe_model == 'pca':
             data = self.pca_fe(data)
         elif self.fe_model == 'hg':
-            features = map(lambda entry:map(lambda feat: float(feat), entry[0:-1]), data)
-            labels = map(lambda entry:entry[-1], data)
-            labels_set = set(labels)
-            #represent labels as ints
-            labels = map(lambda lbl: list(labels_set).index(lbl), labels)
-            scaler = MinMaxScaler()
-            normalized = scaler.fit_transform(features)
-            data = self.hg_fe(normalized, labels)
+            # features = map(lambda entry:map(lambda feat: float(feat), entry[0:-1]), data)
+            # labels = map(lambda entry:entry[-1], data)
+            # labels_set = set(labels)
+            # #represent labels as ints
+            # labels = map(lambda lbl: list(labels_set).index(lbl), labels)
+            # scaler = MinMaxScaler()
+            # normalized = scaler.fit_transform(features)
+            data = self.hg_fe(data, labels)
 
         train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.66, random_state=42)
 
