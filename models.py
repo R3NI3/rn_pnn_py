@@ -73,9 +73,9 @@ class PNN:
 
         return features
 
-    def pca_fe(self, data, attrs=4):
+    def pca_fe(self, data, attrs=0.95):
         data = np.array(data)
-        pca = PCA(n_components=attrs)
+        pca = PCA(n_components=attrs, svd_solver='full')
         pca.fit(data)
         features = pca.transform(data)
 
