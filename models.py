@@ -9,7 +9,7 @@ import sklearn.metrics
 import Util
 
 
-sim_threshold = 0.1
+sim_threshold = 1
 
 
 class PNN:
@@ -19,7 +19,7 @@ class PNN:
         self.fe_model = fe_model
 
     def training_step(self, training_set, in_class):
-        clss_set = set(in_class)
+        clss_set = set(in_class[0])
         #first layer weight matrix: w_mat1[i][j] is i -> j weight
 
         self.w_mat1 = training_set
@@ -53,7 +53,7 @@ class PNN:
         feat = np.transpose(features)
         feat_diss_mat = map(lambda f: abs(f[..., np.newaxis] - f), feat)
         # choose features that are similar
-        feat_vec = map(lambda feat: 1 if np.where(feat < threshold)[0].size == len(features)**2 else 0, feat_diss_mat);
+        feat_vec = map(lambda feat: 1 if np.where(feat <= threshold)[0].size == len(features)**2 else 0, feat_diss_mat);
 
         return feat_vec
 
@@ -82,22 +82,17 @@ class PNN:
         return features
 
     def run(self, data, labels):
-        print len(data[0])
         if self.fe_model == 'pca':
             data = self.pca_fe(data)
         elif self.fe_model == 'hg':
-            print data[0]
             npdata = np.array(data)
             features = npdata[:,:-1]
             labels = npdata[:,-1:]
             scaler = MinMaxScaler()
             normalized = scaler.fit_transform(features)
             data = np.concatenate((normalized,labels),axis=1).tolist()
-            print data[0]
-            
+
             data = self.hg_fe([i[:-1] for i in data], [i[-1] for i in data])
-        print len(data[0])
-        input()
         train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.66, random_state=42)
 
         model = PNN(self.sigma)
