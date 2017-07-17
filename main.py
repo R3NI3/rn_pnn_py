@@ -1,6 +1,7 @@
 from models import PNN
 import Util
 import csv
+import numpy as np
 
 if __name__ == '__main__':
     dataset_names = ["iris", "b_cancer", "digits"]
@@ -10,17 +11,19 @@ if __name__ == '__main__':
         results[name] = []
         for value in sigma_values:
             value = float(value + 1)/10
-            pnn = PNN(sigma=value, fe_model='pca')
+            pnn = PNN(sigma=value, fe_model=None)
             dataset = Util.load_datasets(name=name)
             r = pnn.run(dataset.data.tolist(), dataset.target.tolist())
-            results[name].append(["sigma: " + str(value), r[0], r[1][0], r[1][1], r[1][2], r[1][3]])
+            means = np.mean(r[1], axis=1)
+            results[name].append([name, 'accuracy', 'Precision', "Recall", "F-Score", "Support"])
+            results[name].append(["sigma: " + str(value), r[0], means[0], means[1], means[2], means[3]])
+            results[name].append(["Dados por classe"])
+            for line in np.transpose(r[1]):
+                results[name].append(list([" ", " "] + line.tolist()))
 
-    with open('results_pca.csv', 'wb') as csvfile:
-        spamwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        for name in dataset_names:
-            spamwriter.writerow([name, 'accuracy', 'Precision', "Recall", "F-Score", "Support"])
-            for key in results.keys():
-                if key == name:
-                    data = results[key]
-                    for line in data:
-                        spamwriter.writerow(line)
+    for name in results.keys():
+        with open(name + '/results.csv', 'wb') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            content = results[name]
+            for line in content:
+                spamwriter.writerow(line)

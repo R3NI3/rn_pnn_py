@@ -99,4 +99,4 @@ class PNN:
         model = PNN(self.sigma)
         model.training_step(train_data, train_labels)
         res = model.classification(test_data, test_labels)
-        return sklearn.metrics.accuracy_score(res, test_labels), np.mean(sklearn.metrics.precision_recall_fscore_support(res, test_labels), axis=1)
+        return sklearn.metrics.accuracy_score(res, test_labels), sklearn.metrics.precision_recall_fscore_support(res, test_labels)

@@ -21,6 +21,8 @@ def load_datasets(name = None):
         dataset = sklearn.datasets.load_iris()
     if name == "species":
         dataset = sklearn.datasets.fetch_covtype()
+    if name == "boston":
+        dataset = sklearn.datasets.load_boston()
 
     return dataset
 
