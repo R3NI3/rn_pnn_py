@@ -11,7 +11,7 @@ if __name__ == '__main__':
         results[name] = []
         for value in sigma_values:
             value = float(value + 1)/10
-            pnn = PNN(sigma=value, fe_model=None)
+            pnn = PNN(sigma=value, fe_model='hg')
             dataset = Util.load_datasets(name=name)
             r = pnn.run(dataset.data.tolist(), dataset.target.tolist())
             means = np.mean(r[1], axis=1)
@@ -22,7 +22,7 @@ if __name__ == '__main__':
                 results[name].append(list([" ", " "] + line.tolist()))
 
     for name in results.keys():
-        with open(name + '/results.csv', 'wb') as csvfile:
+        with open(name + '/results_hg.csv', 'wb') as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             content = results[name]
             for line in content:
