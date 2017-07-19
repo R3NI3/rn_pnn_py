@@ -1,60 +1,61 @@
-iris,accuracy,Precision,Recall,F-Score,Support,Classification Time,feature numbers before,feature numbers after
-sigma: 0.1,1.0,1.0,1.0,1.0,33.0,0.04486894607543945,4,2
+iris,accuracy,Precision,Recall,F-Score,Support,Classification Time /ms,feature numbers before,feature numbers after
+sigma: 0.1,1.0,1.0,1.0,1.0,33.0,0.0416109561920166,4,2
 Dados por classe
  , ,1.0,1.0,1.0,37.0
  , ,1.0,1.0,1.0,32.0
  , ,1.0,1.0,1.0,30.0
-iris,accuracy,Precision,Recall,F-Score,Support,Classification Time,feature numbers before,feature numbers after
-sigma: 0.2,0.96969696969696972,0.96805555555555556,0.967741935483871,0.96773354150403323,33.0,0.03853106498718262,4,2
+iris,accuracy,Precision,Recall,F-Score,Support,Classification Time /ms,feature numbers before,feature numbers after
+sigma: 0.2,0.96969696969696972,0.96805555555555556,0.967741935483871,0.96773354150403323,33.0,0.03653693199157715,4,2
 Dados por classe
  , ,1.0,1.0,1.0,37.0
  , ,0.9375,0.967741935483871,0.9523809523809523,31.0
  , ,0.9666666666666667,0.9354838709677419,0.9508196721311476,31.0
-iris,accuracy,Precision,Recall,F-Score,Support,Classification Time,feature numbers before,feature numbers after
-sigma: 0.3,0.95959595959595956,0.95694444444444449,0.95694444444444449,0.95694444444444449,33.0,0.03868603706359863,4,2
+iris,accuracy,Precision,Recall,F-Score,Support,Classification Time /ms,feature numbers before,feature numbers after
+sigma: 0.3,0.95959595959595956,0.95694444444444449,0.95694444444444449,0.95694444444444449,33.0,0.03638100624084473,4,2
 Dados por classe
  , ,1.0,1.0,1.0,37.0
  , ,0.9375,0.9375,0.9375,32.0
  , ,0.9333333333333333,0.9333333333333333,0.9333333333333333,30.0
-iris,accuracy,Precision,Recall,F-Score,Support,Classification Time,feature numbers before,feature numbers after
-sigma: 0.4,0.95959595959595956,0.95694444444444449,0.95694444444444449,0.95694444444444449,33.0,0.0388181209564209,4,2
+iris,accuracy,Precision,Recall,F-Score,Support,Classification Time /ms,feature numbers before,feature numbers after
+sigma: 0.4,0.95959595959595956,0.95694444444444449,0.95694444444444449,0.95694444444444449,33.0,0.037310123443603516,4,2
 Dados por classe
  , ,1.0,1.0,1.0,37.0
  , ,0.9375,0.9375,0.9375,32.0
  , ,0.9333333333333333,0.9333333333333333,0.9333333333333333,30.0
-iris,accuracy,Precision,Recall,F-Score,Support,Classification Time,feature numbers before,feature numbers after
-sigma: 0.5,0.95959595959595956,0.95694444444444449,0.95694444444444449,0.95694444444444449,33.0,0.0384829044342041,4,2
+iris,accuracy,Precision,Recall,F-Score,Support,Classification Time /ms,feature numbers before,feature numbers after
+sigma: 0.5,0.95959595959595956,0.95694444444444449,0.95694444444444449,0.95694444444444449,33.0,0.035906076431274414,4,2
 Dados por classe
  , ,1.0,1.0,1.0,37.0
  , ,0.9375,0.9375,0.9375,32.0
  , ,0.9333333333333333,0.9333333333333333,0.9333333333333333,30.0
-iris,accuracy,Precision,Recall,F-Score,Support,Classification Time,feature numbers before,feature numbers after
-sigma: 0.6,0.9494949494949495,0.9458333333333333,0.9467084639498432,0.9461103867883528,33.0,0.03844118118286133,4,2
+iris,accuracy,Precision,Recall,F-Score,Support,Classification Time /ms,feature numbers before,feature numbers after
+sigma: 0.6,0.9494949494949495,0.9458333333333333,0.9467084639498432,0.9461103867883528,33.0,0.0360569953918457,4,2
 Dados por classe
  , ,1.0,1.0,1.0,37.0
  , ,0.9375,0.9090909090909091,0.923076923076923,33.0
  , ,0.9,0.9310344827586207,0.9152542372881356,29.0
-iris,accuracy,Precision,Recall,F-Score,Support,Classification Time,feature numbers before,feature numbers after
-sigma: 0.7,0.93939393939393945,0.93472222222222223,0.93697478991596628,0.93521421107628011,33.0,0.04021096229553223,4,2
+iris,accuracy,Precision,Recall,F-Score,Support,Classification Time /ms,feature numbers before,feature numbers after
+sigma: 0.7,0.93939393939393945,0.93472222222222223,0.93697478991596628,0.93521421107628011,33.0,0.03600478172302246,4,2
 Dados por classe
  , ,1.0,1.0,1.0,37.0
  , ,0.9375,0.8823529411764706,0.9090909090909091,34.0
  , ,0.8666666666666667,0.9285714285714286,0.896551724137931,28.0
-iris,accuracy,Precision,Recall,F-Score,Support,Classification Time,feature numbers before,feature numbers after
-sigma: 0.8,0.92929292929292928,0.9243055555555556,0.92511320097526994,0.92455454150369398,33.0,0.03777003288269043,4,2
+iris,accuracy,Precision,Recall,F-Score,Support,Classification Time /ms,feature numbers before,feature numbers after
+sigma: 0.8,0.92929292929292928,0.9243055555555556,0.92511320097526994,0.92455454150369398,33.0,0.03586006164550781,4,2
 Dados por classe
  , ,1.0,1.0,1.0,37.0
  , ,0.90625,0.8787878787878788,0.8923076923076922,33.0
  , ,0.8666666666666667,0.896551724137931,0.8813559322033899,29.0
-iris,accuracy,Precision,Recall,F-Score,Support,Classification Time,feature numbers before,feature numbers after
-sigma: 0.9,0.92929292929292928,0.9243055555555556,0.92511320097526994,0.92455454150369398,33.0,0.03956198692321777,4,2
+iris,accuracy,Precision,Recall,F-Score,Support,Classification Time /ms,feature numbers before,feature numbers after
+sigma: 0.9,0.92929292929292928,0.9243055555555556,0.92511320097526994,0.92455454150369398,33.0,0.03615307807922363,4,2
 Dados por classe
  , ,1.0,1.0,1.0,37.0
  , ,0.90625,0.8787878787878788,0.8923076923076922,33.0
  , ,0.8666666666666667,0.896551724137931,0.8813559322033899,29.0
-iris,accuracy,Precision,Recall,F-Score,Support,Classification Time,feature numbers before,feature numbers after
-sigma: 1.0,0.92929292929292928,0.9243055555555556,0.92511320097526994,0.92455454150369398,33.0,0.04056501388549805,4,2
+iris,accuracy,Precision,Recall,F-Score,Support,Classification Time /ms,feature numbers before,feature numbers after
+sigma: 1.0,0.92929292929292928,0.9243055555555556,0.92511320097526994,0.92455454150369398,33.0,0.035092830657958984,4,2
 Dados por classe
  , ,1.0,1.0,1.0,37.0
  , ,0.90625,0.8787878787878788,0.8923076923076922,33.0
  , ,0.8666666666666667,0.896551724137931,0.8813559322033899,29.0
+Average time:0.0366912841797 ms
