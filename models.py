@@ -6,17 +6,22 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import sklearn.metrics
+from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
 import Util
+from Util import timing
+import time
 
 
-sim_threshold = 1
+sim_threshold = 0.95
 
 
 class PNN:
 
-    def __init__(self, sigma, fe_model = 'None'):
+    def __init__(self, sigma, fe_model = 'None', classifier = 'pnn'):
         self.sigma = sigma
         self.fe_model = fe_model
+        self.classifier = classifier
 
     def training_step(self, training_set, in_class):
         clss_set = set(in_class)
@@ -26,6 +31,7 @@ class PNN:
         #second layer weight matrix: w_mat2[i][j] = 1 if j = class_i, 0 otherwise
 
         self.w_mat2 = np.transpose([map(lambda k: 1 if k == i else 0, in_class) for i in clss_set])
+
 
     def classification(self, sample, label):
         # step 1: compute pattern layer
@@ -93,18 +99,27 @@ class PNN:
         if self.fe_model == 'pca':
             data = self.pca_fe(data)
         elif self.fe_model == 'hg':
-            # features = map(lambda entry:map(lambda feat: float(feat), entry[0:-1]), data)
-            # labels = map(lambda entry:entry[-1], data)
-            # labels_set = set(labels)
-            # #represent labels as ints
-            # labels = map(lambda lbl: list(labels_set).index(lbl), labels)
-            # scaler = MinMaxScaler()
-            # normalized = scaler.fit_transform(features)
             data = self.hg_fe(data, labels)
 
         train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.66, random_state=42)
+        res = None
+        start_time = 0
+        if self.classifier == 'pnn':
+            model = PNN(self.sigma)
+            model.training_step(train_data, train_labels)
+            start_time = time.time()
+            res = model.classification(test_data, test_labels)
 
-        model = PNN(self.sigma)
-        model.training_step(train_data, train_labels)
-        res = model.classification(test_data, test_labels)
-        return sklearn.metrics.accuracy_score(res, test_labels), sklearn.metrics.precision_recall_fscore_support(res, test_labels)
+        elif self.classifier == 'mlp':
+
+            model = MLPClassifier()
+            model.fit(train_data, train_labels)
+            res = model.predict(test_data)
+
+        elif self.classifier == 'svm':
+
+            model = SVC()
+            model.fit(train_data, train_labels)
+            res = model.predict(test_data)
+
+        return sklearn.metrics.accuracy_score(res, test_labels), sklearn.metrics.precision_recall_fscore_support(res, test_labels), (time.time() - start_time), len(train_data[0])

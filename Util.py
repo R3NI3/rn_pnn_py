@@ -1,6 +1,6 @@
 import numpy as np
 import sklearn.datasets
-import pandas
+import time
 
 def load_dataset():
     dataset = sklearn.datasets.fetch_kddcup99(percent10=True)
@@ -26,12 +26,11 @@ def load_datasets(name = None):
 
     return dataset
 
-
-def convert_nominal_to_integer(data):
-    data = np.transpose(data).tolist()
-
-    data[1] = pandas.get_dummies(data[1]).values.argmax(1)
-    data[2] = pandas.get_dummies(data[1]).values.argmax(1)
-    data[3] = pandas.get_dummies(data[1]).values.argmax(1)
-
-    return np.transpose(data).astype(float)
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print('{} function took {} ms'.format(f.__name__, (time2-time1)*1000.0))
+        return ret
+    return wrap
